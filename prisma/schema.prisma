@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  firstName String 
+  lastName String
+  phoneNo String @unique
+  email String @unique
+  password String
+  otp Int 
+  createdAt DateTime @default(now())
+  kycDocument KYCDocument?
+  myBeneficiaries MyBeneficiary[]
+}
+
+model KYCDocument{
+  id Int @id @default(autoincrement())
+  frontImage String
+  backImage String
+  user User @relation(fields: [userId], references: [id])
+  userId Int @unique
+}
+
+model Transaction {
+  id Int @id  @default(autoincrement())
+  transactionId Int
+  purpose String
+  transferred Decimal
+  convenienceCharges Decimal
+  totalPaid Decimal
+  myBeneficiary MyBeneficiary @relation(fields: [myBeneficiaryId], references: [id])
+  myBeneficiaryId Int
+}
+
+model MyBeneficiary {
+  id Int @id  @default(autoincrement())
+  name String
+  phoneNo String @unique
+  bank String
+  addedOn DateTime
+  addedByUser User @relation(fields: [addedBy], references: [id])
+  addedBy Int
+  transactions Transaction[]
+}
+
